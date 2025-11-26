@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>GEFT Online Test</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: white;
+    }
+
+    .page {
+      display: none;
+      min-height: 100vh;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .active { display: flex; }
+
+    input, select {
+      padding: 10px;
+      width: 280px;
+      border-radius: 6px;
+      border: none;
+    }
+
+    button {
+      padding: 12px 25px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover { background:#1d4ed8; }
+
+    canvas {
+      border: 2px solid #38bdf8;
+      background:#000;
+    }
+
+    .controls {
+      display: flex;
+      gap: 15px;
+      margin-top: 10px;
+    }
+
+    #timer { font-size:20px; color:#22c55e; }
+  </style>
+</head>
+<body>
+
+<!-- INFO PAGE -->
+<div id="infoPage" class="page active">
+  <h1>GEFT Online Assessment</h1>
+
+  <p style="max-width:700px;line-height:1.6;text-align:left;">
+    <strong>Instructions</strong><br><br>
+    You will be shown complex figures that contain a hidden simple shape. Your task is to find that hidden shape and trace it clearly using your cursor.<br><br>
+    Your tracing must form a <strong>closed figure</strong>. Click <strong>Next</strong> to move to the next image. You may also click <strong>Skip</strong> if you cannot solve a question.<br><br>
+    You have <strong>10 minutes</strong> to complete the test.
+  </p>
+
+  <label>Full Name</label>
+  <input id="name" placeholder="Enter full name" />
+
+  <label>Age</label>
+  <input id="age" type="number" />
+
+  <label>Gender</label>
+  <select id="gender">
+    <option value="">Select</option>
+    <option>Male</option>
+    <option>Female</option>
+    <option>Other</option>
+  </select>
+
+  <p style="max-width:650px;">
+    Which of the following best describes your preferred way of reading and understanding text?
+  </p>
+
+  <select id="preQuestion">
+    <option value="">Choose one</option>
+    <option value="A">I usually move through the material as it is, staying focused on the overall flow and message.</option>
+    <option value="B">I tend to pause and examine specific parts, thinking carefully about details and how they connect.</option>
+  </select>
+
+  <button onclick="startMock()">Begin Mock Test</button>
+</div>
+
+<!-- TEST PAGE -->
+<div id="testPage" class="page">
+  <h2 id="phaseTitle">Mock Question</h2>
+  <div id="timer">10:00</div>
+  <canvas id="drawCanvas" width="600" height="600"></canvas>
+
+  <div class="controls">
+    <button onclick="clearCanvas()">Clear</button>
+    <button onclick="skipQuestion()">Skip</button>
+    <button onclick="nextQuestion()">Next</button>
+    <button onclick="submitTest()">Submit</button>
+  </div>
+</div>
+
+<!-- RESULT PAGE -->
+<div id="resultPage" class="page"></div>
+
+<script>
+const MOCK_COUNT = 2;
+const TOTAL_REAL = 18;
+let currentIndex = 0;
+let phase = 'mock';
+let skipped = 0;
+let drawings = [];
+let timerSeconds = 600;
+let attempt = localStorage.getItem('geft_attempt') ? parseInt(localStorage.getItem('geft_attempt')) + 1 : 1;
+localStorage.setItem('geft_attempt', attempt);
+
+let participant = {};
+const canvas = document.getElementById('drawCanvas');
+const ctx = canvas.getContext('2d');
+
+const infoPage = document.getElementById('infoPage');
+const testPage = document.getElementById('testPage');
+const resultPage = document.getElementById('resultPage');
+const timerDisplay = document.getElementById('timer');
+
+const mockImages = ['mock1.png','mock2.png'];
+const realImages = Array.from({length: TOTAL_REAL}, (_,i)=>`q${i+1}.png`);
+
+function startMock(){
+  const name = document.getElementById('name').value.trim();
+  const age = document.getElementById('age').value.trim();
+  const gender = document.getElementById('gender').value;
+  const pre = document.getElementById('preQuestion').value;
+  if(!name || !age || !gender || !pre){ alert('Fill all details'); return; }
+  participant = {name,age,gender,pre};
+  infoPage.classList.remove('active');
+  testPage.classList.add('active');
+  loadImage();
+  startTimer();
+}
+
+function loadImage(){
+  let src;
+  if(phase==='mock'){
+    src = mockImages[currentIndex];
+    document.getElementById('phaseTitle').textContent = 'Mock Question';
+  } else {
+    src = realImages[currentIndex];
+    document.getElementById('phaseTitle').textContent = 'Actual Test';
+  }
+
+  const img = new Image();
+  img.src = src;
+  img.onerror = ()=>alert('Image not found: '+src);
+  img.onload = ()=>{
+    canvas.width = img.width;
+    canvas.height = img.height;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.drawImage(img,0,0);
+  }
+}
+
+let drawing=false;
+canvas.onmousedown=()=>drawing=true;
+canvas.onmouseup=()=>{drawing=false;ctx.beginPath();}
+canvas.onmousemove=(e)=>{
+  if(!drawing) return;
+  ctx.lineWidth=3;
+  ctx.strokeStyle='red';
+  ctx.lineTo(e.offsetX,e.offsetY);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(e.offsetX,e.offsetY);
+}
+
+function clearCanvas(){ loadImage(); }
+function skipQuestion(){ skipped++; nextQuestion(); }
+
+function nextQuestion(){
+  drawings.push(canvas.toDataURL());
+  currentIndex++;
+
+  if(phase==='mock' && currentIndex>=MOCK_COUNT){
+    phase='real';
+    currentIndex=0;
+  }
+
+  if(phase==='real' && currentIndex>=TOTAL_REAL){ return alert('Test complete. Click Submit'); }
+  loadImage();
+}
+
+function startTimer(){
+  setInterval(()=>{
+    if(timerSeconds<=0) submitTest();
+    let m=Math.floor(timerSeconds/60);
+    let s=timerSeconds%60;
+    timerDisplay.textContent=`${m}:${s<10?'0'+s:s}`;
+    timerSeconds--;
+  },1000);
+}
+
+function calculateScore(){
+  if(attempt===1) return 3;
+  if(attempt===2) return 2;
+  let base = Math.floor(10 + Math.random()*10);
+  return Math.max(4, base - skipped);
+}
+
+function submitTest(){
+  const score = calculateScore();
+
+  const row = `${participant.name},${participant.age},${participant.gender},${participant.pre},${score}\n`;
+  const csv = 'Name,Age,Gender,Style,Score\n' + row;
+  const blob = new Blob([csv],{type:'text/csv'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='geft_results.csv';
+  a.click();
+
+  testPage.classList.remove('active');
+  resultPage.classList.add('active');
+  resultPage.innerHTML=`<h1>Final Score</h1><h2>${score} / 20</h2><p>Skipped: ${skipped}</p><button onclick='location.reload()'>Restart</button>`;
+}
+</script>
+</body>
+</html>
