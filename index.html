@@ -204,19 +204,32 @@ function advance(){
   loadImage();
 }
 
-function calculateScore(){
-  if(attempt===1) return 3;
-  if(attempt===2) return 2;
+function calculateScore() {
+  // First two attempts fixed as requested
+  if (attempt === 1) return 3;
+  if (attempt === 2) return 2;
 
-  const attempted = realResults.filter(r=>!r.skipped);
-  const ratio = attempted.length/TOTAL_REAL;
-  let coverage = attempted.reduce((a,b)=>a+b.coverage,0)/(attempted.length||1);
-  let base = Math.round((ratio*coverage)*20);
-  base -= skipped>10?3:0;
-  base = Math.max(4, Math.min(20, base));
-  return base;
+  const attempted = TOTAL_REAL - skipped;
+
+  // Analyse drawing effort
+  const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+  let redCount = 0;
+
+  for (let i = 0; i < pixels.length; i += 4) {
+    const r = pixels[i], g = pixels[i+1], b = pixels[i+2];
+    if (r > 150 && g < 100 && b < 100) redCount++;
+  }
+
+  const drawRatio = redCount / (canvas.width * canvas.height);
+
+  // Score calculation dynamically varies
+  let score = Math.round((attempted / TOTAL_REAL) * 12 + drawRatio * 12);
+
+  if (score < 4) score = 4;
+  if (score > 20) score = 20;
+
+  return score;
 }
-
 function submitTest(){
   clearInterval(timerInterval);
   const score = calculateScore();
@@ -230,7 +243,11 @@ function submitTest(){
 
   testPage.classList.remove('active');
   resultPage.classList.add('active');
-  resultPage.innerHTML = `<h1>Final Score</h1><h2>${score} / 20</h2><p>Skipped: ${skipped}</p><button onclick='location.reload()'>Restart</button>`;
+  resultPage.innerHTML=`
+  <h1>Final Score</h1>
+  <h2>${score} / 20</h2>
+  <button onclick='location.reload()'>Restart</button>
+`;
 }
 </script>
 </body>
