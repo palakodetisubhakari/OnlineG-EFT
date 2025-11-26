@@ -1,506 +1,562 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>GEFT Online Test</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0f172a;
-      color: white;
-    }
+  <meta charset="UTF-8" />
+  <title>GEFT Online Test</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: white;
+    }
 
-    .page {
-      display: none;
-      min-height: 100vh;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 15px;
-      padding: 20px;
-      box-sizing: border-box;
-    }
+    .page {
+      display: none;
+      min-height: 100vh;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 15px;
+      padding: 20px;
+      box-sizing: border-box;
+    }
 
-    .active {
-      display: flex;
-    }
+    .active {
+      display: flex;
+    }
 
-    h1, h2 {
-      margin: 5px 0;
-    }
+    h1, h2 {
+      margin: 5px 0;
+    }
 
-    p {
-      margin: 5px 0;
-    }
+    p {
+      margin: 5px 0;
+    }
 
-    input, select {
-      padding: 10px;
-      width: 280px;
-      border-radius: 6px;
-      border: none;
-      font-size: 14px;
-    }
+    input, select {
+      padding: 10px;
+      width: 280px;
+      border-radius: 6px;
+      border: none;
+      font-size: 14px;
+      color: black; /* Added to make input text visible */
+    }
 
-    label {
-      align-self: flex-start;
-      margin-left: calc(50% - 140px);
-      font-size: 14px;
-      opacity: 0.85;
-    }
+    label {
+      align-self: flex-start;
+      margin-left: calc(50% - 140px);
+      font-size: 14px;
+      opacity: 0.85;
+    }
 
-    button {
-      padding: 12px 25px;
-      background: #2563eb;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 16px;
-    }
+    button {
+      padding: 12px 25px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.3s; /* Added for smoother hover */
+    }
 
-    button:hover {
-      background: #1d4ed8;
-    }
+    button:hover {
+      background: #1d4ed8;
+    }
 
-    canvas {
-      border: 2px solid #38bdf8;
-      background: #000;
-      touch-action: none;
-    }
+    canvas {
+      border: 2px solid #38bdf8;
+      background: #000;
+      touch-action: none;
+      max-width: 100%; /* Ensure canvas scales on smaller screens */
+      height: auto;
+    }
 
-    .controls {
-      display: flex;
-      gap: 15px;
-      margin-top: 10px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
+    .controls {
+      display: flex;
+      gap: 15px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
 
-    #timer {
-      font-size: 20px;
-      color: #22c55e;
-      margin-bottom: 8px;
-    }
+    #timer {
+      font-size: 20px;
+      color: #22c55e;
+      margin-bottom: 8px;
+    }
 
-    .subtitle {
-      max-width: 720px;
-      line-height: 1.6;
-      text-align: left;
-    }
-  </style>
+    .subtitle {
+      max-width: 720px;
+      line-height: 1.6;
+      text-align: left;
+    }
+  </style>
 </head>
 <body>
 
-<!-- INFO PAGE -->
 <div id="infoPage" class="page active">
-  <h1>GEFT Online Assessment</h1>
+  <h1>GEFT Online Assessment</h1>
 
-  <p class="subtitle">
-    <strong>Instructions</strong><br><br>
-    You will see complex figures that contain a hidden simple shape. Your task is to find that hidden shape and
-    <strong>trace it clearly as a closed figure</strong> using your cursor or stylus.<br><br>
-    For each item, carefully trace the simple figure on top of the complex one. When you are done, click
-    <strong>Next</strong> to move ahead. If you are unable to find the shape, you may click <strong>Skip</strong> to move
-    to the next question.<br><br>
-    You will first complete <strong>2 sample (mock) questions</strong> to get used to the task.
-    These mock questions are <strong>not timed</strong> and are only for practice.<br><br>
-    After the mock questions, the actual test will begin. You will have
-    <strong>10 minutes</strong> to attempt <strong>18 questions</strong>.
-  </p>
+  <p class="subtitle">
+    <strong>Instructions</strong><br><br>
+    You will see complex figures that contain a hidden simple shape. Your task is to find that hidden shape and
+    <strong>trace it clearly as a closed figure</strong> using your cursor or stylus.<br><br>
+    For each item, carefully trace the simple figure on top of the complex one. When you are done, click
+    <strong>Next</strong> to move ahead. If you are unable to find the shape, you may click <strong>Skip</strong> to move
+    to the next question.<br><br>
+    You will first complete <strong>2 sample (mock) questions</strong> to get used to the task.
+    These mock questions are <strong>not timed</strong> and are only for practice.<br><br>
+    After the mock questions, the actual test will begin. You will have
+    <strong>10 minutes</strong> to attempt <strong>18 questions</strong>.
+  </p>
 
-  <label for="name">Full Name</label>
-  <input id="name" placeholder="Enter full name" />
+  <label for="name">Full Name</label>
+  <input id="name" placeholder="Enter full name" />
 
-  <label for="age">Age</label>
-  <input id="age" type="number" min="5" max="100" />
+  <label for="age">Age</label>
+  <input id="age" type="number" min="5" max="100" />
 
-  <label for="gender">Gender</label>
-  <select id="gender">
-    <option value="">Select</option>
-    <option>Male</option>
-    <option>Female</option>
-    <option>Other</option>
-  </select>
+  <label for="gender">Gender</label>
+  <select id="gender">
+    <option value="">Select</option>
+    <option>Male</option>
+    <option>Female</option>
+    <option>Other</option>
+  </select>
 
-  <p class="subtitle">
-    Which of the following best describes your preferred way of reading and understanding text?
-  </p>
+  <p class="subtitle">
+    Which of the following best describes your preferred way of reading and understanding text?
+  </p>
 
-  <select id="preQuestion">
-    <option value="">Choose one</option>
-    <option value="A">
-      I usually move through the material as it is and understand quickly.
-    </option>
-    <option value="B">
-      I tend to take my time , pause and understand each part before moving ahead. 
-    </option>
-  </select>
+  <select id="preQuestion">
+    <option value="">Choose one</option>
+    <option value="A">
+      I usually move through the material as it is and understand quickly.
+    </option>
+    <option value="B">
+      I tend to take my time , pause and understand each part before moving ahead. 
+    </option>
+  </select>
 
-  <button id="starttrialBtn">Begin Trial Test</button>
+    <button id="startMockBtn">Begin Trial Test</button>
 </div>
 
-<!-- TEST PAGE -->
 <div id="testPage" class="page">
-  <h2 id="phaseTitle">Trial Question</h2>
-  <div id="timer">Timer: 10:00 (starts with actual test)</div>
-  <canvas id="drawCanvas" width="600" height="600"></canvas>
+  <h2 id="phaseTitle">Trial Question</h2>
+  <div id="timer">Timer: 10:00 (starts with actual test)</div>
+  <canvas id="drawCanvas" width="600" height="600"></canvas>
 
-  <div class="controls">
-    <button id="clearBtn">Clear</button>
-    <button id="skipBtn">Skip</button>
-    <button id="nextBtn">Next</button>
-    <button id="submitBtn">Submit</button>
-  </div>
+  <div class="controls">
+    <button id="clearBtn">Clear</button>
+    <button id="skipBtn">Skip</button>
+    <button id="nextBtn">Next</button>
+        <button id="submitBtn" style="display: none;">Submit</button>
+  </div>
 </div>
 
-<!-- RESULT PAGE -->
 <div id="resultPage" class="page"></div>
 
 <script>
-  // -----------------------------
-  // CONSTANTS & STATE
-  // -----------------------------
-  const MOCK_COUNT = 2;
-  const TOTAL_REAL = 18;
-  const TOTAL_REAL_TIME = 600; // 10 minutes in seconds
+  // -----------------------------
+  // CONSTANTS & STATE
+  // -----------------------------
+  const MOCK_COUNT = 2;
+  const TOTAL_REAL = 18;
+  const TOTAL_REAL_TIME = 600; // 10 minutes in seconds
 
-  const mockImages = ['mock1.png', 'mock2.png'];
-  const realImages = Array.from({ length: TOTAL_REAL }, (_, i) => `q${i + 1}.png`);
+  const mockImages = ['mock1.png', 'mock2.png'];
+  const realImages = Array.from({ length: TOTAL_REAL }, (_, i) => `q${i + 1}.png`);
 
-  let phase = 'mock';           // 'mock' or 'real'
-  let mockIndex = 0;            // 0..MOCK_COUNT-1
-  let realIndex = 0;            // 0..TOTAL_REAL-1
-  let timerSeconds = TOTAL_REAL_TIME;
-  let timerId = null;
+  let phase = 'mock';           // 'mock' or 'real'
+  let mockIndex = 0;            // 0..MOCK_COUNT-1
+  let realIndex = 0;            // 0..TOTAL_REAL-1
+  let timerSeconds = TOTAL_REAL_TIME;
+  let timerId = null;
 
-  // For scoring
-  let responsesReal = new Array(TOTAL_REAL).fill(null); // { skipped: bool, effort: number 0..1 }
+  // For scoring
+  let responsesReal = new Array(TOTAL_REAL).fill(null); // { skipped: bool, effort: number 0..1 }
 
-  // Attempts across sessions
-  let attemptNum = parseInt(localStorage.getItem('geft_attempt') || '0', 10) + 1;
-  localStorage.setItem('geft_attempt', String(attemptNum));
+  // Attempts across sessions
+  let attemptNum = parseInt(localStorage.getItem('geft_attempt') || '0', 10) + 1;
+  localStorage.setItem('geft_attempt', String(attemptNum));
 
-  let participant = {
-    name: '',
-    age: '',
-    gender: '',
-    style: ''
-  };
+  let participant = {
+    name: '',
+    age: '',
+    gender: '',
+    style: ''
+  };
 
-  // -----------------------------
-  // DOM ELEMENTS
-  // -----------------------------
-  const infoPage = document.getElementById('infoPage');
-  const testPage = document.getElementById('testPage');
-  const resultPage = document.getElementById('resultPage');
-  const phaseTitle = document.getElementById('phaseTitle');
-  const timerDisplay = document.getElementById('timer');
+  // -----------------------------
+  // DOM ELEMENTS
+  // -----------------------------
+  const infoPage = document.getElementById('infoPage');
+  const testPage = document.getElementById('testPage');
+  const resultPage = document.getElementById('resultPage');
+  const phaseTitle = document.getElementById('phaseTitle');
+  const timerDisplay = document.getElementById('timer');
+  const nameInput = document.getElementById('name');
+  const ageInput = document.getElementById('age');
+  const genderSelect = document.getElementById('gender');
+  const preQuestionSelect = document.getElementById('preQuestion');
 
-  const canvas = document.getElementById('drawCanvas');
-  const ctx = canvas.getContext('2d');
-  canvas.style.touchAction = 'none';
+  const canvas = document.getElementById('drawCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.style.touchAction = 'none';
 
-  const startMockBtn = document.getElementById('startMockBtn');
-  const clearBtn = document.getElementById('clearBtn');
-  const skipBtn = document.getElementById('skipBtn');
-  const nextBtn = document.getElementById('nextBtn');
-  const submitBtn = document.getElementById('submitBtn');
+  // Corrected ID reference
+  const startMockBtn = document.getElementById('startMockBtn');
+  const clearBtn = document.getElementById('clearBtn');
+  const skipBtn = document.getElementById('skipBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const submitBtn = document.getElementById('submitBtn');
 
-  // -----------------------------
-  // IMAGE LOADING
-  // -----------------------------
-  function loadCurrentImage() {
-    let src;
-    if (phase === 'trial') {
-      src = mockImages[mockIndex];
-      phaseTitle.textContent = `Mock Question ${mockIndex + 1} of ${MOCK_COUNT}`;
-      timerDisplay.textContent = 'Timer: 10:00 (starts with actual test)';
-    } else {
-      src = realImages[realIndex];
-      phaseTitle.textContent = `Actual Test Question ${realIndex + 1} of ${TOTAL_REAL}`;
-    }
+  // -----------------------------
+  // UTILITY FUNCTIONS
+  // -----------------------------
+  function updateControlVisibility() {
+    // Show/Hide Next/Submit based on phase and index
+    if (phase === 'mock' || realIndex < TOTAL_REAL - 1) {
+      nextBtn.style.display = ''; // Show
+      submitBtn.style.display = 'none'; // Hide
+    } else if (phase === 'real' && realIndex === TOTAL_REAL - 1) {
+      nextBtn.style.display = 'none'; // Hide
+      submitBtn.style.display = ''; // Show
+    } else {
+      // Fallback for safety/mock complete
+      nextBtn.style.display = 'none';
+      submitBtn.style.display = '';
+    }
+    // Skip button is only for real test, but we can allow it for mock for flow consistency
+    skipBtn.style.display = '';
+  }
 
-    const img = new Image();
-    img.src = src;
-    img.onload = () => {
-      // Fit canvas to image
-      canvas.width = img.width;
-      canvas.height = img.height;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    };
-    img.onerror = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = 'black';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = 'red';
-      ctx.font = '20px Arial';
-      ctx.fillText(`Image not found: ${src}`, 20, 40);
-    };
-  }
 
-  // -----------------------------
-  // DRAWING (POINTER EVENTS)
-  // -----------------------------
-  let drawing = false;
-  let lastX = 0;
-  let lastY = 0;
+  // -----------------------------
+  // IMAGE LOADING
+  // -----------------------------
+  function loadCurrentImage() {
+    let src;
+    if (phase === 'mock') {
+      src = mockImages[mockIndex];
+      phaseTitle.textContent = `Mock Question ${mockIndex + 1} of ${MOCK_COUNT}`;
+      timerDisplay.textContent = 'Timer: 10:00 (starts with actual test)';
+    } else {
+      src = realImages[realIndex];
+      phaseTitle.textContent = `Actual Test Question ${realIndex + 1} of ${TOTAL_REAL}`;
+    }
 
-  canvas.addEventListener('pointerdown', (e) => {
-    e.preventDefault();
-    const rect = canvas.getBoundingClientRect();
-    lastX = e.clientX - rect.left;
-    lastY = e.clientY - rect.top;
-    drawing = true;
-  });
+    updateControlVisibility(); // Update button visibility on image load
 
-  canvas.addEventListener('pointermove', (e) => {
-    if (!drawing) return;
-    e.preventDefault();
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const img = new Image();
+    img.crossOrigin = "Anonymous"; // Added for potential canvas security issues
+    img.src = src;
+    img.onload = () => {
+      // Fit canvas to image
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      // Redraw existing drawing if stored (optional, but good practice)
+    };
+    img.onerror = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = 'black';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = 'red';
+      ctx.font = '20px Arial';
+      ctx.fillText(`Image not found: ${src}`, 20, 40);
+    };
+  }
 
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = 'red';
-    ctx.lineCap = 'round';
+  // -----------------------------
+  // DRAWING (POINTER EVENTS)
+  // -----------------------------
+  let drawing = false;
+  let lastX = 0;
+  let lastY = 0;
+  // Store drawing data URL for current question
+  let currentDrawingUrl = null;
 
-    ctx.beginPath();
-    ctx.moveTo(lastX, lastY);
-    ctx.lineTo(x, y);
-    ctx.stroke();
+  canvas.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    lastX = e.clientX - rect.left;
+    lastY = e.clientY - rect.top;
+    drawing = true;
+  });
 
-    lastX = x;
-    lastY = y;
-  });
+  canvas.addEventListener('pointermove', (e) => {
+    if (!drawing) return;
+    e.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
 
-  canvas.addEventListener('pointerup', (e) => {
-    e.preventDefault();
-    drawing = false;
-    ctx.beginPath();
-  });
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = 'red';
+    ctx.lineCap = 'round';
 
-  canvas.addEventListener('pointerleave', (e) => {
-    e.preventDefault();
-    drawing = false;
-    ctx.beginPath();
-  });
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(x, y);
+    ctx.stroke();
 
-  // -----------------------------
-  // TIMER (ONLY FOR REAL TEST)
-  // -----------------------------
-  function startRealTimer() {
-    if (timerId) clearInterval(timerId);
-    timerSeconds = TOTAL_REAL_TIME;
+    lastX = x;
+    lastY = y;
+    // The drawing should be saved implicitly via effort estimate on transition
+  });
 
-    timerId = setInterval(() => {
-      if (timerSeconds <= 0) {
-        clearInterval(timerId);
-        timerId = null;
-        submitTest(); // auto-submit
-        return;
-      }
-      const min = Math.floor(timerSeconds / 60);
-      const sec = timerSeconds % 60;
-      timerDisplay.textContent = `${min}:${sec < 10 ? '0' + sec : sec}`;
-      timerSeconds--;
-    }, 1000);
-  }
+  canvas.addEventListener('pointerup', (e) => {
+    e.preventDefault();
+    drawing = false;
+    ctx.beginPath();
+  });
 
-  // -----------------------------
-  // EFFORT ESTIMATION (RED PIXELS)
-  // -----------------------------
-  function estimateEffort() {
-    try {
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-      let redPixels = 0;
-      const totalPixels = canvas.width * canvas.height;
+  canvas.addEventListener('pointerleave', (e) => {
+    e.preventDefault();
+    drawing = false;
+    ctx.beginPath();
+  });
 
-      for (let i = 0; i < imageData.length; i += 4) {
-        const r = imageData[i];
-        const g = imageData[i + 1];
-        const b = imageData[i + 2];
-        if (r > 150 && g < 80 && b < 80) {
-          redPixels++;
-        }
-      }
+  // -----------------------------
+  // TIMER (ONLY FOR REAL TEST)
+  // -----------------------------
+  function startRealTimer() {
+    if (timerId) clearInterval(timerId);
+    timerSeconds = TOTAL_REAL_TIME;
 
-      const ratio = redPixels / totalPixels; // 0..1-ish (usually small)
-      // Non-linear scaling so small drawings still count
-      const scaled = Math.pow(Math.min(ratio * 50, 1), 0.6); // amplify then compress
-      return scaled; // 0..1
-    } catch (e) {
-      return 0;
-    }
-  }
+    timerId = setInterval(() => {
+      if (timerSeconds <= 0) {
+        clearInterval(timerId);
+        timerId = null;
+        alert('Time is up! Submitting test.');
+        submitTest(); // auto-submit
+        return;
+      }
+      const min = Math.floor(timerSeconds / 60);
+      const sec = timerSeconds % 60;
+      timerDisplay.textContent = `${min}:${sec < 10 ? '0' + sec : sec}`;
+      timerSeconds--;
+    }, 1000);
+  }
 
-  function saveCurrentRealResponse() {
-    if (phase !== 'real') return;
-    const effort = estimateEffort();
-    const skipped = effort < 0.02; // very low effort treated as skipped
-    responsesReal[realIndex] = { skipped, effort };
-  }
+  // -----------------------------
+  // EFFORT ESTIMATION (RED PIXELS)
+  // -----------------------------
+  function estimateEffort() {
+    // Note: This effort estimation is highly reliant on the red line drawing and might be inaccurate
+    // if the complex image contains red pixels. It serves as a proxy for "attempted".
+    try {
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+      let redPixels = 0;
+      const totalPixels = canvas.width * canvas.height;
 
-  // -----------------------------
-  // SCORE CALCULATION
-  // -----------------------------
-  function calculateScore() {
-    const valid = responsesReal.filter(r => r !== null);
-    if (valid.length === 0) {
-      return 4;
-    }
+      // Check for primary red color (assuming line is near pure red: 255, 0, 0)
+      for (let i = 0; i < imageData.length; i += 4) {
+        const r = imageData[i];
+        const g = imageData[i + 1];
+        const b = imageData[i + 2];
+        if (r > 150 && g < 80 && b < 80) {
+          redPixels++;
+        }
+      }
 
-    const attempted = valid.filter(r => !r.skipped);
-    const attemptRatio = attempted.length / TOTAL_REAL; // 0..1
+      const ratio = redPixels / totalPixels;
+      // Non-linear scaling so small drawings still count. Max effort is 1.
+      const scaled = Math.pow(Math.min(ratio * 50, 1), 0.6);
+      return scaled; // 0..1
+    } catch (e) {
+      console.error("Could not estimate effort:", e);
+      return 0;
+    }
+  }
 
-    let avgEffort = 0;
-    if (attempted.length > 0) {
-      avgEffort = attempted.reduce((s, r) => s + r.effort, 0) / attempted.length; // 0..1
-    }
+  function saveCurrentRealResponse() {
+    if (phase !== 'real') return;
+    const effort = estimateEffort();
+    // Only update if the user hasn't already explicitly skipped this question
+    if (responsesReal[realIndex] === null || responsesReal[realIndex].skipped === false) {
+      // If the effort is very low, it's considered skipped implicitly
+      const skipped = effort < 0.02;
+      responsesReal[realIndex] = { skipped, effort };
+    }
+    // If explicitly skipped, we keep the { skipped: true, effort: 0 } set in skipQuestion()
+  }
 
-    // Base scoring:
-    //  - more attempted -> higher
-    //  - more effort -> higher
-    let raw = 4 + 8 * attemptRatio + 8 * avgEffort;
+  // -----------------------------
+  // SCORE CALCULATION
+  // -----------------------------
+  function calculateScore() {
+    // Ensure the final question response is saved before calculation
+    saveCurrentRealResponse();
 
-    // Add small jitter based on attempt number so every sitting isn't identical
-    const jitterRange = attemptNum <= 2 ? 1.0 : 2.0;
-    const jitter = (Math.random() - 0.5) * jitterRange * 2; // -range..+range
-    raw += jitter;
+    const valid = responsesReal.filter(r => r !== null);
+    if (valid.length === 0) {
+      return 0; // Return 0 if nothing was done
+    }
 
-    if (raw < 4) raw = 4;
-    if (raw > 20) raw = 20;
+    const attempted = valid.filter(r => !r.skipped);
+    const attemptCount = attempted.length; // Corrected to use actual attempts
 
-    return Math.round(raw);
-  }
+    // Simplified Scoring Logic (as actual GEFT scoring requires knowing the *correct* answer)
+    // The code uses attempts/effort as a proxy for "field independence" trait measurement.
 
-  // -----------------------------
-  // BUTTON HANDLERS
-  // -----------------------------
-  function startMock() {
-    const name = document.getElementById('name').value.trim();
-    const age = document.getElementById('age').value.trim();
-    const gender = document.getElementById('gender').value;
-    const pre = document.getElementById('preQuestion').value;
+    // 1. Score based on number of questions where effort was registered
+    let rawScore = attemptCount; // Base score is number of attempted (non-skipped) questions (max 18)
 
-    if (!name || !age || !gender || !pre) {
-      alert('Please fill in all details before starting.');
-      return;
-    }
+    // 2. Normalize and apply scale (GEFT typically maxes at 18/20)
+    // The original code had a complex calculation: 4 + 8*attemptRatio + 8*avgEffort
+    // Let's use a simpler linear scale based on the 18 questions, capped at 20.
+    let score = rawScore; // Max 18
 
-    participant = { name, age, gender, style: pre };
+    // Add small jitter based on attempt number
+    const jitterRange = attemptNum <= 2 ? 1.0 : 2.0;
+    const jitter = (Math.random() - 0.5) * jitterRange; // -range/2..+range/2
+    score += jitter;
 
-    infoPage.classList.remove('active');
-    testPage.classList.add('active');
+    // The result should be between 0 and 20 (The GEFT score range).
+    if (score < 0) score = 0;
+    if (score > 20) score = 20;
 
-    phase = 'mock';
-    mockIndex = 0;
-    realIndex = 0;
-    loadCurrentImage(); // no timer for mock
-  }
+    return Math.round(score);
+  }
 
-  function clearCanvas() {
-    loadCurrentImage();
-  }
+  // -----------------------------
+  // BUTTON HANDLERS
+  // -----------------------------
+  function startMock() {
+    const name = nameInput.value.trim();
+    const age = ageInput.value.trim();
+    const gender = genderSelect.value;
+    const pre = preQuestionSelect.value;
 
-  function goToNextQuestion() {
-    if (phase === 'mock') {
-      mockIndex++;
-      if (mockIndex >= MOCK_COUNT) {
-        // Move to real test
-        phase = 'real';
-        realIndex = 0;
-        loadCurrentImage();
-        startRealTimer();
-      } else {
-        loadCurrentImage();
-      }
-    } else {
-      // real phase
-      saveCurrentRealResponse();
-      realIndex++;
-      if (realIndex >= TOTAL_REAL) {
-        realIndex = TOTAL_REAL - 1;
-        alert('All questions are completed. You can now click Submit.');
-      } else {
-        loadCurrentImage();
-      }
-    }
-  }
+    if (!name || !age || !gender || !pre) {
+      alert('Please fill in all details before starting.');
+      return;
+    }
 
-  function skipQuestion() {
-    if (phase === 'mock') {
-      mockIndex++;
-      if (mockIndex >= MOCK_COUNT) {
-        phase = 'real';
-        realIndex = 0;
-        loadCurrentImage();
-        startRealTimer();
-      } else {
-        loadCurrentImage();
-      }
-    } else {
-      // mark as skipped explicitly
-      responsesReal[realIndex] = { skipped: true, effort: 0 };
-      realIndex++;
-      if (realIndex >= TOTAL_REAL) {
-        realIndex = TOTAL_REAL - 1;
-        alert('All questions are completed. You can now click Submit.');
-      } else {
-        loadCurrentImage();
-      }
-    }
-  }
+    participant = { name, age, gender, style: pre };
 
-  function submitTest() {
-    if (phase === 'mock') {
-      alert('Please complete the actual test before submitting.');
-      return;
-    }
+    infoPage.classList.remove('active');
+    testPage.classList.add('active');
 
-    // Save current question as attempt or skip based on effort
-    saveCurrentRealResponse();
+    phase = 'mock';
+    mockIndex = 0;
+    realIndex = 0;
+    responsesReal = new Array(TOTAL_REAL).fill(null); // Reset responses
+    loadCurrentImage(); // no timer for mock
+  }
 
-    if (timerId) {
-      clearInterval(timerId);
-      timerId = null;
-    }
+  function clearCanvas() {
+    // This reloads the image, effectively clearing the drawing
+    loadCurrentImage();
+  }
 
-    const score = calculateScore();
+  function goToNextQuestion() {
+    if (phase === 'mock') {
+      mockIndex++;
+      if (mockIndex >= MOCK_COUNT) {
+        // Transition to real test
+        phase = 'real';
+        realIndex = 0;
+        loadCurrentImage();
+        startRealTimer();
+      } else {
+        loadCurrentImage();
+      }
+    } else {
+      // real phase
+      saveCurrentRealResponse();
+      realIndex++;
+      if (realIndex >= TOTAL_REAL) {
+        // Max index reached, stop pushing "Next" and prompt submit
+        realIndex = TOTAL_REAL - 1; // Stay on the last question
+        updateControlVisibility();
+        alert('You have reached the last question. Please click Submit to finish.');
+      } else {
+        loadCurrentImage();
+      }
+    }
+  }
 
-    // Create CSV with participant + score
-    const header = 'Name,Age,Gender,Style,Score\n';
-    const row = `${participant.name},${participant.age},${participant.gender},${participant.style},${score}\n`;
-    const csv = header + row;
+  function skipQuestion() {
+    if (phase === 'mock') {
+      mockIndex++;
+      if (mockIndex >= MOCK_COUNT) {
+        // Transition to real test
+        phase = 'real';
+        realIndex = 0;
+        loadCurrentImage();
+        startRealTimer();
+      } else {
+        loadCurrentImage();
+      }
+    } else {
+      // real phase - mark as skipped explicitly
+      responsesReal[realIndex] = { skipped: true, effort: 0 };
+      realIndex++;
+      if (realIndex >= TOTAL_REAL) {
+        realIndex = TOTAL_REAL - 1;
+        updateControlVisibility();
+        alert('You have reached the last question. Please click Submit to finish.');
+      } else {
+        loadCurrentImage();
+      }
+    }
+  }
 
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'geft_results.csv';
-    a.click();
+  function submitTest() {
+    if (phase === 'mock') {
+      alert('Please complete the actual test before submitting.');
+      return;
+    }
 
-    testPage.classList.remove('active');
-    resultPage.classList.add('active');
+    // Ensure the final question response is saved
+    saveCurrentRealResponse();
 
-    resultPage.innerHTML = `
-      <h1>GEFT Result</h1>
-      <h2 style="font-size:40px;color:#22c55e;">${score} / 20</h2>
-      <p>Thank you for completing the assessment.</p>
-      <button onclick="location.reload()">Restart</button>
-    `;
-  }
+    if (timerId) {
+      clearInterval(timerId);
+      timerId = null;
+    }
 
-  // -----------------------------
-  // WIRE UP BUTTONS
-  // -----------------------------
-  startMockBtn.addEventListener('click', startMock);
-  clearBtn.addEventListener('click', clearCanvas);
-  nextBtn.addEventListener('click', goToNextQuestion);
-  skipBtn.addEventListener('click', skipQuestion);
-  submitBtn.addEventListener('click', submitTest);
+    const score = calculateScore();
+
+    // Create CSV with participant + score
+    const header = 'Name,Age,Gender,Style,Attempted,Skipped,Score\n';
+    const attemptedCount = responsesReal.filter(r => r !== null && !r.skipped).length;
+    const skippedCount = responsesReal.filter(r => r !== null && r.skipped).length;
+    const row = `${participant.name},${participant.age},${participant.gender},${participant.style},${attemptedCount},${skippedCount},${score}\n`;
+    const csv = header + row;
+
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'geft_results.csv';
+    a.click();
+
+    testPage.classList.remove('active');
+    resultPage.classList.add('active');
+
+    resultPage.innerHTML = `
+      <h1>GEFT Result</h1>
+      <h2 style="font-size:40px;color:#22c55e;">${score} / 20</h2>
+      <p>Thank you for completing the assessment.</p>
+      <p style="font-size: 14px; opacity: 0.7;">(Results downloaded as geft_results.csv)</p>
+      <button onclick="location.reload()">Restart</button>
+    `;
+  }
+
+  // -----------------------------
+  // WIRE UP BUTTONS
+  // -----------------------------
+  startMockBtn.addEventListener('click', startMock);
+  clearBtn.addEventListener('click', clearCanvas);
+  nextBtn.addEventListener('click', goToNextQuestion);
+  skipBtn.addEventListener('click', skipQuestion);
+  submitBtn.addEventListener('click', submitTest);
 </script>
 </body>
 </html>
-
-
