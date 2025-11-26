@@ -205,34 +205,19 @@ function advance(){
 }
 
 function calculateScore(){
-  // Real dynamic scoring based on effort + attempted questions
-  const attempted = drawings.length;
-  const total = TOTAL_REAL;
+  if(attempt===1) return 3;
+  if(attempt===2) return 2;
 
-  // Analyse how much red was drawn on last canvas
-  const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-  let redPixels = 0;
-  for (let i = 0; i < data.length; i += 4) {
-    const r = data[i], g = data[i + 1], b = data[i + 2];
-    if (r > 150 && g < 80 && b < 80) redPixels++;
-  }
-
-  const effortRatio = redPixels / (canvas.width * canvas.height);
-
-  // Base score from attempts
-  let score = Math.round((attempted / total) * 14);
-
-  // Add drawing effort impact
-  score += Math.round(effortRatio * 12);
-
-  // Normalize hard limits
-  if (score < 4) score = 4;
-  if (score > 20) score = 20;
-
-  return score;
+  const attempted = realResults.filter(r=>!r.skipped);
+  const ratio = attempted.length/TOTAL_REAL;
+  let coverage = attempted.reduce((a,b)=>a+b.coverage,0)/(attempted.length||1);
+  let base = Math.round((ratio*coverage)*20);
+  base -= skipped>10?3:0;
+  base = Math.max(4, Math.min(20, base));
+  return base;
 }
 
-function submitTest(){(){
+function submitTest(){
   clearInterval(timerInterval);
   const score = calculateScore();
 
@@ -245,11 +230,7 @@ function submitTest(){(){
 
   testPage.classList.remove('active');
   resultPage.classList.add('active');
-  resultPage.innerHTML=`
-  <h1>Final Score</h1>
-  <h2>${score} / 20</h2>
-  <button onclick='location.reload()'>Restart</button>
-`;
+  resultPage.innerHTML = `<h1>Final Score</h1><h2>${score} / 20</h2><p>Skipped: ${skipped}</p><button onclick='location.reload()'>Restart</button>`;
 }
 </script>
 </body>
