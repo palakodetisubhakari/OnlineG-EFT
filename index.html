@@ -204,33 +204,35 @@ function advance(){
   loadImage();
 }
 
-function calculateScore() {
-  // First two attempts fixed as requested
-  if (attempt === 1) return 3;
-  if (attempt === 2) return 2;
+function calculateScore(){
+  // Real dynamic scoring based on effort + attempted questions
+  const attempted = drawings.length;
+  const total = TOTAL_REAL;
 
-  const attempted = TOTAL_REAL - skipped;
-
-  // Analyse drawing effort
-  const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-  let redCount = 0;
-
-  for (let i = 0; i < pixels.length; i += 4) {
-    const r = pixels[i], g = pixels[i+1], b = pixels[i+2];
-    if (r > 150 && g < 100 && b < 100) redCount++;
+  // Analyse how much red was drawn on last canvas
+  const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+  let redPixels = 0;
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i], g = data[i + 1], b = data[i + 2];
+    if (r > 150 && g < 80 && b < 80) redPixels++;
   }
 
-  const drawRatio = redCount / (canvas.width * canvas.height);
+  const effortRatio = redPixels / (canvas.width * canvas.height);
 
-  // Score calculation dynamically varies
-  let score = Math.round((attempted / TOTAL_REAL) * 12 + drawRatio * 12);
+  // Base score from attempts
+  let score = Math.round((attempted / total) * 14);
 
+  // Add drawing effort impact
+  score += Math.round(effortRatio * 12);
+
+  // Normalize hard limits
   if (score < 4) score = 4;
   if (score > 20) score = 20;
 
   return score;
 }
-function submitTest(){
+
+function submitTest(){(){
   clearInterval(timerInterval);
   const score = calculateScore();
 
