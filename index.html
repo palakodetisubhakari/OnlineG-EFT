@@ -212,7 +212,7 @@
   // -----------------------------
   function loadCurrentImage() {
     let src;
-    if (phase === 'mock') {
+    if (phase === 'trial') {
       src = mockImages[mockIndex];
       phaseTitle.textContent = `Mock Question ${mockIndex + 1} of ${MOCK_COUNT}`;
       timerDisplay.textContent = 'Timer: 10:00 (starts with actual test)';
@@ -502,4 +502,5 @@
 </script>
 </body>
 </html>
+
 
