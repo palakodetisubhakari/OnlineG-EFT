@@ -2,13 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>GEFT Online Test</title>
+  <title>GEFT Online Assessment</title>
   <style>
+    * { box-sizing: border-box; }
+
     body {
       margin: 0;
       font-family: Arial, sans-serif;
       background: #0f172a;
-      color: white;
+      color: #e5e7eb;
     }
 
     .page {
@@ -17,219 +19,634 @@
       align-items: center;
       justify-content: center;
       flex-direction: column;
-      gap: 15px;
+      padding: 24px;
+      gap: 24px;
     }
 
-    .active { display: flex; }
+    .page.active {
+      display: flex;
+    }
+
+    .card {
+      max-width: 900px;
+      width: 100%;
+      background: #020617;
+      border-radius: 16px;
+      padding: 24px 32px;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.55);
+    }
+
+    h1, h2, h3 {
+      margin: 0 0 12px 0;
+      color: #f9fafb;
+    }
+
+    p {
+      margin: 4px 0;
+      line-height: 1.5;
+    }
+
+    label {
+      font-size: 14px;
+      margin-bottom: 4px;
+      display: block;
+      color: #cbd5f5;
+    }
 
     input, select {
-      padding: 10px;
-      width: 280px;
-      border-radius: 6px;
-      border: none;
+      padding: 10px 12px;
+      width: 260px;
+      border-radius: 8px;
+      border: 1px solid #1f2937;
+      background: #020617;
+      color: #e5e7eb;
+    }
+
+    input:focus, select:focus {
+      outline: 2px solid #2563eb;
+      outline-offset: 1px;
     }
 
     button {
-      padding: 12px 25px;
+      padding: 10px 20px;
       background: #2563eb;
-      color: white;
+      color: #f9fafb;
       border: none;
-      border-radius: 8px;
+      border-radius: 999px;
       cursor: pointer;
-      font-size: 16px;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
     }
 
-    button:hover { background:#1d4ed8; }
+    button:hover { background: #1d4ed8; }
+    button:disabled { opacity: 0.4; cursor: default; }
+
+    .btn-secondary {
+      background: #4b5563;
+    }
+
+    .btn-secondary:hover {
+      background: #374151;
+    }
+
+    .field-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px 32px;
+      margin-top: 12px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .instructions {
+      margin-top: 8px;
+      padding: 12px 14px;
+      background: #020617;
+      border-radius: 12px;
+      border: 1px solid #1e293b;
+      font-size: 14px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #0f172a;
+      font-size: 12px;
+      color: #a5b4fc;
+      border: 1px solid #1d4ed8;
+      margin-bottom: 4px;
+    }
+
+    #timer {
+      font-size: 18px;
+      font-weight: 600;
+      color: #22c55e;
+    }
+
+    #questionLabel {
+      font-size: 16px;
+      color: #bfdbfe;
+    }
+
+    #canvasWrapper {
+      margin-top: 12px;
+      border-radius: 18px;
+      border: 2px solid #38bdf8;
+      overflow: hidden;
+      background: #000000;
+    }
 
     canvas {
-      border: 2px solid #38bdf8;
-      background:#000;
+      display: block;
+      touch-action: none; /* IMPORTANT for stylus/touch drawing */
     }
 
     .controls {
+      margin-top: 16px;
       display: flex;
-      gap: 15px;
-      margin-top: 10px;
+      flex-wrap: wrap;
+      gap: 10px;
     }
 
-    #timer { font-size:20px; color:#22c55e; }
+    .result-line {
+      margin: 6px 0;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
 
-<!-- INFO PAGE -->
+<!-- =========================
+     PAGE 1: INFO + INSTRUCTIONS
+     ========================= -->
 <div id="infoPage" class="page active">
-  <h1>GEFT Online Assessment</h1>
+  <div class="card">
+    <h1>GEFT Online Assessment</h1>
+    <p style="margin-top:-4px;color:#9ca3af;">
+      Group Embedded Figures Test – digital tracing version.
+    </p>
 
-  <p style="max-width:700px;line-height:1.6;text-align:left;">
-    <strong>Instructions</strong><br><br>
-    You will be shown complex figures that contain a hidden simple shape. Your task is to find that hidden shape and trace it clearly using your cursor.<br><br>
-    Your tracing must form a <strong>closed figure</strong>. Click <strong>Next</strong> to move to the next image. You may also click <strong>Skip</strong> if you cannot solve a question.<br><br>
-    You have <strong>10 minutes</strong> to complete the test.
-  </p>
+    <div class="instructions">
+      <span class="tag">Please read carefully before starting</span>
+      <ul style="margin:8px 0 0 18px;padding-left:0;font-size:14px;">
+        <li>You will see a series of <strong>complex figures</strong>. Inside each one, there is a hidden <strong>simple figure</strong>.</li>
+        <li>Your task is to <strong>locate the simple figure</strong> and <strong>trace it clearly</strong> on top of the complex image using your mouse, stylus, or finger.</li>
+        <li>Your tracing should form a <strong>closed shape</strong> that follows the simple figure as accurately as you can.</li>
+        <li>Use the <strong>Clear</strong> button if you want to erase and redraw your tracing.</li>
+        <li>Two <strong>sample questions</strong> will appear first. They are only for practice and <strong>do not count</strong> towards your score or time.</li>
+        <li>After the samples, the actual test will begin. You will have a total of <strong>10 minutes</strong> to answer all test questions.</li>
+        <li>For each test item you may either <strong>Next</strong> (after drawing) or <strong>Skip</strong> (if you cannot find the figure).</li>
+      </ul>
+    </div>
 
-  <label>Full Name</label>
-  <input id="name" placeholder="Enter full name" />
+    <h3 style="margin-top:22px;">Participant Details</h3>
+    <div class="field-row">
+      <div class="field">
+        <label for="name">Full Name</label>
+        <input id="name" placeholder="Enter full name" />
+      </div>
+      <div class="field">
+        <label for="age">Age</label>
+        <input id="age" type="number" min="5" max="100" placeholder="Age" />
+      </div>
+      <div class="field">
+        <label for="gender">Gender</label>
+        <select id="gender">
+          <option value="">Select gender</option>
+          <option>Female</option>
+          <option>Male</option>
+          <option>Other</option>
+          <option>Prefer not to say</option>
+        </select>
+      </div>
+    </div>
 
-  <label>Age</label>
-  <input id="age" type="number" />
+    <div class="field" style="margin-top:18px;">
+      <label for="readingStyle">
+        Which of the following best describes your preferred way of reading and understanding text?
+      </label>
+      <select id="readingStyle">
+        <option value="">Choose your response</option>
+        <option value="A">
+          I usually move through the material as it is, staying focused on the overall flow and message.
+        </option>
+        <option value="B">
+          I tend to pause and examine specific parts, thinking carefully about details and how they connect.
+        </option>
+      </select>
+    </div>
 
-  <label>Gender</label>
-  <select id="gender">
-    <option value="">Select</option>
-    <option>Male</option>
-    <option>Female</option>
-    <option>Other</option>
-  </select>
-
-  <p style="max-width:650px;">
-    Which of the following best describes your preferred way of reading and understanding text?
-  </p>
-
-  <select id="preQuestion">
-    <option value="">Choose one</option>
-    <option value="A">I usually move through the material as it is, staying focused on the overall flow and message.</option>
-    <option value="B">I tend to pause and examine specific parts, thinking carefully about details and how they connect.</option>
-  </select>
-
-  <button onclick="startMock()">Begin Mock Test</button>
-</div>
-
-<!-- TEST PAGE -->
-<div id="testPage" class="page">
-  <h2 id="phaseTitle">Mock Question</h2>
-  <div id="timer">10:00</div>
-  <canvas id="drawCanvas" width="600" height="600"></canvas>
-
-  <div class="controls">
-    <button onclick="clearCanvas()">Clear</button>
-    <button onclick="skipQuestion()">Skip</button>
-    <button onclick="nextQuestion()">Next</button>
-    <button onclick="submitTest()">Submit</button>
+    <div style="margin-top:24px;display:flex;justify-content:flex-end;">
+      <button id="beginBtn">Begin – Show Sample Questions</button>
+    </div>
   </div>
 </div>
 
-<!-- RESULT PAGE -->
-<div id="resultPage" class="page"></div>
+<!-- =========================
+     PAGE 2: DRAWING (SAMPLES + REAL)
+     ========================= -->
+<div id="testPage" class="page">
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <div>
+        <div id="phaseLabel" style="font-size:14px;color:#a5b4fc;">Sample phase</div>
+        <div id="questionLabel">Sample 1 of 2</div>
+      </div>
+      <div id="timer" style="visibility:hidden;">10:00</div>
+    </div>
+
+    <div id="canvasWrapper">
+      <canvas id="drawCanvas" width="600" height="600"></canvas>
+    </div>
+
+    <div class="controls">
+      <button id="clearBtn" class="btn-secondary">Clear</button>
+      <button id="skipBtn" class="btn-secondary">Skip</button>
+      <button id="nextBtn">Next</button>
+      <button id="submitBtn" class="btn-secondary">Submit</button>
+    </div>
+  </div>
+</div>
+
+<!-- =========================
+     PAGE 3: RESULTS
+     ========================= -->
+<div id="resultPage" class="page">
+  <div class="card" id="resultCard">
+    <!-- filled via JS -->
+  </div>
+</div>
 
 <script>
-const MOCK_COUNT = 2;
-const TOTAL_REAL = 18;
-let currentIndex = 0;
-let phase = 'mock';
-let skipped = 0;
-let drawings = [];
-let timerSeconds = 600;
-let attempt = localStorage.getItem('geft_attempt') ? parseInt(localStorage.getItem('geft_attempt')) + 1 : 1;
-localStorage.setItem('geft_attempt', attempt);
+/* -----------------------
+   GLOBAL CONFIG & STATE
+   ----------------------- */
 
-let participant = {};
-const canvas = document.getElementById('drawCanvas');
-const ctx = canvas.getContext('2d');
+// files must exist in same repo: mock1.png, mock2.png, q1.png..q18.png
+const MOCK_IMAGES = ["mock1.png", "mock2.png"];
+const REAL_QUESTION_COUNT = 18;
+const REAL_IMAGES = Array.from({ length: REAL_QUESTION_COUNT }, (_, i) => `q${i + 1}.png`);
 
-const infoPage = document.getElementById('infoPage');
-const testPage = document.getElementById('testPage');
-const resultPage = document.getElementById('resultPage');
-const timerDisplay = document.getElementById('timer');
+const TOTAL_TEST_TIME = 600; // 10 minutes in seconds
 
-const mockImages = ['mock1.png','mock2.png'];
-const realImages = Array.from({length: TOTAL_REAL}, (_,i)=>`q${i+1}.png`);
+// phases: "info" -> "mock" -> "real" -> "done"
+let phase = "info";
 
-function startMock(){
-  const name = document.getElementById('name').value.trim();
-  const age = document.getElementById('age').value.trim();
-  const gender = document.getElementById('gender').value;
-  const pre = document.getElementById('preQuestion').value;
-  if(!name || !age || !gender || !pre){ alert('Fill all details'); return; }
-  participant = {name,age,gender,pre};
-  infoPage.classList.remove('active');
-  testPage.classList.add('active');
-  loadImage();
-  startTimer();
+let currentMockIndex = 0;
+let currentRealIndex = 0;
+
+let timerSeconds = TOTAL_TEST_TIME;
+let timerId = null;
+
+// for scoring
+// one entry per REAL question: { coverage: number (0-1), skipped: boolean }
+let realResults = [];
+
+// simple participant record
+let participant = { name: "", age: "", gender: "", readingStyle: "" };
+
+// attempt tracking (localStorage)
+let attempt = parseInt(localStorage.getItem("geft_attempt") || "0", 10) + 1;
+localStorage.setItem("geft_attempt", String(attempt));
+
+/* -----------------------
+   DOM ELEMENTS
+   ----------------------- */
+const infoPage   = document.getElementById("infoPage");
+const testPage   = document.getElementById("testPage");
+const resultPage = document.getElementById("resultPage");
+
+const beginBtn     = document.getElementById("beginBtn");
+const clearBtn     = document.getElementById("clearBtn");
+const skipBtn      = document.getElementById("skipBtn");
+const nextBtn      = document.getElementById("nextBtn");
+const submitBtn    = document.getElementById("submitBtn");
+const phaseLabel   = document.getElementById("phaseLabel");
+const questionLabel= document.getElementById("questionLabel");
+const timerDisplay = document.getElementById("timer");
+const resultCard   = document.getElementById("resultCard");
+
+const canvas = document.getElementById("drawCanvas");
+const ctx     = canvas.getContext("2d");
+
+/* -----------------------
+   HELPER: PAGE SWITCH
+   ----------------------- */
+function showPage(pageName) {
+  infoPage.classList.remove("active");
+  testPage.classList.remove("active");
+  resultPage.classList.remove("active");
+
+  if (pageName === "info")  infoPage.classList.add("active");
+  if (pageName === "test")  testPage.classList.add("active");
+  if (pageName === "result") resultPage.classList.add("active");
 }
 
-function loadImage(){
-  let src;
-  if(phase==='mock'){
-    src = mockImages[currentIndex];
-    document.getElementById('phaseTitle').textContent = 'Mock Question';
+/* -----------------------
+   LOAD BACKGROUND IMAGE
+   ----------------------- */
+function loadCurrentImage() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  let imgSrc;
+  if (phase === "mock") {
+    imgSrc = MOCK_IMAGES[currentMockIndex];
+    phaseLabel.textContent = "Sample (practice)";
+    questionLabel.textContent = `Sample ${currentMockIndex + 1} of ${MOCK_IMAGES.length}`;
+    timerDisplay.style.visibility = "hidden";
+  } else if (phase === "real") {
+    imgSrc = REAL_IMAGES[currentRealIndex];
+    phaseLabel.textContent = "Actual test";
+    questionLabel.textContent = `Question ${currentRealIndex + 1} of ${REAL_QUESTION_COUNT}`;
+    timerDisplay.style.visibility = "visible";
   } else {
-    src = realImages[currentIndex];
-    document.getElementById('phaseTitle').textContent = 'Actual Test';
+    return;
   }
 
   const img = new Image();
-  img.src = src;
-  img.onerror = ()=>alert('Image not found: '+src);
-  img.onload = ()=>{
-    canvas.width = img.width;
-    canvas.height = img.height;
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    ctx.drawImage(img,0,0);
-  }
+  img.src = imgSrc;
+  img.onload = () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  };
 }
 
-let drawing=false;
-canvas.onmousedown=()=>drawing=true;
-canvas.onmouseup=()=>{drawing=false;ctx.beginPath();}
-canvas.onmousemove=(e)=>{
-  if(!drawing) return;
-  ctx.lineWidth=3;
-  ctx.strokeStyle='red';
-  ctx.lineTo(e.offsetX,e.offsetY);
+/* -----------------------
+   DRAWING (pointer events)
+   ----------------------- */
+let drawing = false;
+
+function getCanvasPos(evt) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: evt.clientX - rect.left,
+    y: evt.clientY - rect.top
+  };
+}
+
+function handlePointerDown(evt) {
+  drawing = true;
+  const pos = getCanvasPos(evt);
+  ctx.beginPath();
+  ctx.moveTo(pos.x, pos.y);
+  canvas.setPointerCapture(evt.pointerId);
+  evt.preventDefault();
+}
+
+function handlePointerMove(evt) {
+  if (!drawing) return;
+  const pos = getCanvasPos(evt);
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = "red";
+  ctx.lineCap = "round";
+  ctx.lineTo(pos.x, pos.y);
   ctx.stroke();
   ctx.beginPath();
-  ctx.moveTo(e.offsetX,e.offsetY);
+  ctx.moveTo(pos.x, pos.y);
+  evt.preventDefault();
 }
 
-function clearCanvas(){ loadImage(); }
-function skipQuestion(){ skipped++; nextQuestion(); }
+function handlePointerUp(evt) {
+  if (!drawing) return;
+  drawing = false;
+  ctx.beginPath();
+  canvas.releasePointerCapture(evt.pointerId);
+  evt.preventDefault();
+}
 
-function nextQuestion(){
-  drawings.push(canvas.toDataURL());
-  currentIndex++;
+canvas.addEventListener("pointerdown", handlePointerDown);
+canvas.addEventListener("pointermove", handlePointerMove);
+canvas.addEventListener("pointerup", handlePointerUp);
+canvas.addEventListener("pointercancel", handlePointerUp);
 
-  if(phase==='mock' && currentIndex>=MOCK_COUNT){
-    phase='real';
-    currentIndex=0;
+/* -----------------------
+   TIMER
+   ----------------------- */
+function startTimer() {
+  if (timerId) clearInterval(timerId);
+  timerSeconds = TOTAL_TEST_TIME;
+
+  timerId = setInterval(() => {
+    const m = Math.floor(timerSeconds / 60);
+    const s = timerSeconds % 60;
+    timerDisplay.textContent = `${m}:${s < 10 ? "0" + s : s}`;
+
+    if (timerSeconds <= 0) {
+      clearInterval(timerId);
+      submitTest();  // auto-submit when time’s up
+    }
+
+    timerSeconds--;
+  }, 1000);
+}
+
+/* -----------------------
+   COVERAGE MEASUREMENT
+   ----------------------- */
+function measureRedCoverage() {
+  const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+  let redPixels = 0;
+  const totalPixels = canvas.width * canvas.height;
+
+  for (let i = 0; i < imgData.length; i += 4) {
+    const r = imgData[i];
+    const g = imgData[i + 1];
+    const b = imgData[i + 2];
+
+    // "mostly red" heuristic
+    if (r > 150 && g < 90 && b < 90) {
+      redPixels++;
+    }
   }
 
-  if(phase==='real' && currentIndex>=TOTAL_REAL){ return alert('Test complete. Click Submit'); }
-  loadImage();
+  return redPixels / totalPixels; // 0–1
 }
 
-function startTimer(){
-  setInterval(()=>{
-    if(timerSeconds<=0) submitTest();
-    let m=Math.floor(timerSeconds/60);
-    let s=timerSeconds%60;
-    timerDisplay.textContent=`${m}:${s<10?'0'+s:s}`;
-    timerSeconds--;
-  },1000);
+/* -----------------------
+   CLEAR
+   ----------------------- */
+function clearCanvas() {
+  loadCurrentImage();
 }
 
-function calculateScore(){
-  if(attempt===1) return 3;
-  if(attempt===2) return 2;
-  let base = Math.floor(10 + Math.random()*10);
-  return Math.max(4, base - skipped);
+/* -----------------------
+   TRANSITIONS & BUTTONS
+   ----------------------- */
+
+// Begin from info page -> go to sample phase
+beginBtn.addEventListener("click", () => {
+  const name = document.getElementById("name").value.trim();
+  const age = document.getElementById("age").value.trim();
+  const gender = document.getElementById("gender").value;
+  const style = document.getElementById("readingStyle").value;
+
+  if (!name || !age || !gender || !style) {
+    alert("Please fill all participant details and the reading-style question.");
+    return;
+  }
+
+  participant = { name, age, gender, readingStyle: style };
+  phase = "mock";
+  currentMockIndex = 0;
+  currentRealIndex = 0;
+  realResults = [];
+
+  showPage("test");
+  loadCurrentImage();
+});
+
+// Clear button
+clearBtn.addEventListener("click", clearCanvas);
+
+// Skip button
+skipBtn.addEventListener("click", () => {
+  if (phase === "mock") {
+    // just move sample forward, no scoring, no timer
+    currentMockIndex++;
+    if (currentMockIndex >= MOCK_IMAGES.length) {
+      // move directly into real phase and start timer
+      phase = "real";
+      currentRealIndex = 0;
+      alert("Sample questions completed. The actual test will now begin. You have 10 minutes.");
+      startTimer();
+    }
+    loadCurrentImage();
+    return;
+  }
+
+  if (phase === "real") {
+    // record this question as skipped
+    realResults.push({ coverage: 0, skipped: true });
+    currentRealIndex++;
+
+    if (currentRealIndex >= REAL_QUESTION_COUNT) {
+      alert("You have reached the end of the test. Click Submit to see your score.");
+      currentRealIndex = REAL_QUESTION_COUNT - 1;
+    }
+
+    loadCurrentImage();
+  }
+});
+
+// Next button
+nextBtn.addEventListener("click", () => {
+  if (phase === "mock") {
+    // just move to next sample
+    currentMockIndex++;
+    if (currentMockIndex >= MOCK_IMAGES.length) {
+      phase = "real";
+      currentRealIndex = 0;
+      alert("Sample questions completed. The actual test will now begin. You have 10 minutes.");
+      startTimer();
+    }
+    loadCurrentImage();
+    return;
+  }
+
+  if (phase === "real") {
+    // store coverage for this question as answered (not skipped)
+    const coverage = measureRedCoverage();
+    realResults.push({ coverage, skipped: false });
+
+    currentRealIndex++;
+    if (currentRealIndex >= REAL_QUESTION_COUNT) {
+      alert("You have answered all questions. Click Submit to finish.");
+      currentRealIndex = REAL_QUESTION_COUNT - 1;
+    }
+
+    loadCurrentImage();
+  }
+});
+
+/* -----------------------
+   SCORE CALCULATION
+   ----------------------- */
+function computeScore() {
+  // first 2 attempts: fixed scores, independent of drawing
+  if (attempt === 1) return 3;
+  if (attempt === 2) return 2;
+
+  // ensure we have exactly REAL_QUESTION_COUNT entries
+  if (realResults.length < REAL_QUESTION_COUNT) {
+    const remaining = REAL_QUESTION_COUNT - realResults.length;
+    for (let i = 0; i < remaining; i++) {
+      realResults.push({ coverage: 0, skipped: true });
+    }
+  }
+
+  const answered = realResults.filter(r => !r.skipped);
+  const skipped  = realResults.filter(r => r.skipped).length;
+
+  let avgCoverage = 0;
+  if (answered.length > 0) {
+    const sum = answered.reduce((acc, r) => acc + r.coverage, 0);
+    avgCoverage = sum / answered.length;
+  }
+
+  const answeredRatio = answered.length / REAL_QUESTION_COUNT;
+
+  // combine both:
+  let combined = avgCoverage * answeredRatio;
+
+  // convert to score range 4–20
+  let score = 4 + combined * 16;
+
+  if (score < 4)  score = 4;
+  if (score > 20) score = 20;
+
+  return Math.round(score);
 }
 
-function submitTest(){
-  const score = calculateScore();
+/* -----------------------
+   SUBMIT
+   ----------------------- */
+function submitTest() {
+  if (phase !== "real") {
+    alert("You must finish the actual test before submitting.");
+    return;
+  }
 
-  const row = `${participant.name},${participant.age},${participant.gender},${participant.pre},${score}\n`;
-  const csv = 'Name,Age,Gender,Style,Score\n' + row;
-  const blob = new Blob([csv],{type:'text/csv'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download='geft_results.csv';
+  // record last question if not yet captured
+  if (realResults.length < REAL_QUESTION_COUNT) {
+    const coverage = measureRedCoverage();
+    realResults.push({ coverage, skipped: false });
+  }
+
+  if (timerId) {
+    clearInterval(timerId);
+    timerId = null;
+  }
+
+  const score = computeScore();
+  phase = "done";
+
+  // prepare CSV row
+  const header = "Name,Age,Gender,ReadingStyleOption,Attempt,Score\n";
+  const row =
+    `"${participant.name}",` +
+    `"${participant.age}",` +
+    `"${participant.gender}",` +
+    `"${participant.readingStyle}",` +
+    `"${attempt}",` +
+    `"${score}"\n`;
+
+  const csvBlob = new Blob([header + row], { type: "text/csv" });
+  const url = URL.createObjectURL(csvBlob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "geft_result.csv";
+  document.body.appendChild(a);
   a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 
-  testPage.classList.remove('active');
-  resultPage.classList.add('active');
-  resultPage.innerHTML=`<h1>Final Score</h1><h2>${score} / 20</h2><p>Skipped: ${skipped}</p><button onclick='location.reload()'>Restart</button>`;
+  // show result page
+  showPage("result");
+  resultCard.innerHTML = `
+    <h1>GEFT Result</h1>
+    <p class="result-line"><strong>Name:</strong> ${participant.name}</p>
+    <p class="result-line"><strong>Age:</strong> ${participant.age}</p>
+    <p class="result-line"><strong>Gender:</strong> ${participant.gender}</p>
+    <p class="result-line"><strong>Reading preference:</strong> ${participant.readingStyle}</p>
+    <p class="result-line"><strong>Attempt:</strong> ${attempt}</p>
+    <h2 style="margin-top:18px;">Score: ${score} / 20</h2>
+    <p class="result-line" style="margin-top:12px;font-size:13px;color:#9ca3af;">
+      A CSV file with this record has been downloaded. You can combine multiple files later for analysis.
+    </p>
+    <div style="margin-top:18px;display:flex;gap:10px;">
+      <button onclick="location.reload()">Restart from beginning</button>
+    </div>
+  `;
 }
+
+submitBtn.addEventListener("click", submitTest);
 </script>
 </body>
 </html>
